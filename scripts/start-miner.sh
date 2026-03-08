@@ -57,6 +57,9 @@ detect_platform() {
             if command -v nvidia-smi &>/dev/null; then
                 BACKEND="cuda"
                 PLATFORM_DESC="Linux x86_64 (NVIDIA GPU)"
+            elif lspci 2>/dev/null | grep -qi 'amd.*vga\|radeon\|amd/ati'; then
+                BACKEND="cpu"
+                PLATFORM_DESC="Linux x86_64 (AMD GPU detected, using CPU — ROCm support coming soon)"
             else
                 BACKEND="cpu"
                 PLATFORM_DESC="Linux x86_64 (CPU)"
