@@ -58,8 +58,14 @@ detect_platform() {
                 BACKEND="cuda"
                 PLATFORM_DESC="Linux x86_64 (NVIDIA GPU)"
             elif lspci 2>/dev/null | grep -qi 'amd.*vga\|radeon\|amd/ati'; then
-                BACKEND="cpu"
-                PLATFORM_DESC="Linux x86_64 (AMD GPU detected, using CPU — ROCm support coming soon)"
+                if command -v rocm-smi &>/dev/null || [[ -d /opt/rocm ]]; then
+                    PLATFORM="linux-x86_64-rocm"
+                    BACKEND="rocm"
+                    PLATFORM_DESC="Linux x86_64 (AMD GPU via ROCm)"
+                else
+                    BACKEND="cpu"
+                    PLATFORM_DESC="Linux x86_64 (AMD GPU detected — install ROCm for GPU acceleration)"
+                fi
             else
                 BACKEND="cpu"
                 PLATFORM_DESC="Linux x86_64 (CPU)"
@@ -131,6 +137,8 @@ build_from_source() {
         FEATURES="metal,candle"
     elif [[ "$BACKEND" == "cuda" ]]; then
         FEATURES="cuda,candle"
+    elif [[ "$BACKEND" == "rocm" ]]; then
+        FEATURES="rocm"
     fi
 
     local SRC_DIR="$INSTALL_DIR/qfc-core"
