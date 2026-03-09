@@ -345,4 +345,5 @@ exec "$BINARY" \
     --wallet "$ADDR" \
     --private-key "$KEY" \
     --validator-rpc "$RPC_URL" \
-    --backend "$BACKEND"
+    --backend "$BACKEND" \
+    --dashboard
