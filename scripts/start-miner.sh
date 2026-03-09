@@ -229,7 +229,8 @@ check_for_update() {
 
     echo -e "${YELLOW}  ┌──────────────────────────────────────────────┐${NC}"
     echo -e "${YELLOW}  │  A new version of qfc-miner is available!   │${NC}"
-    echo -e "${YELLOW}  │  ${LOCAL_VER:-unknown} → ${LATEST_VER}$(printf '%*s' $((34 - ${#LATEST_VER} - ${#LOCAL_VER:-unknown})) '')│${NC}"
+    local DISPLAY_VER="${LOCAL_VER:-unknown}"
+    echo -e "${YELLOW}  │  ${DISPLAY_VER} → ${LATEST_VER}$(printf '%*s' $((34 - ${#LATEST_VER} - ${#DISPLAY_VER})) '')│${NC}"
     echo -e "${YELLOW}  └──────────────────────────────────────────────┘${NC}"
 
     # Auto-update unless QFC_NO_UPDATE=1
