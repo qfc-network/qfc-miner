@@ -71,7 +71,7 @@ docker run --rm \
   -e QFC_MINER_PRIVATE_KEY=0x<YOUR_PRIVATE_KEY> \
   -e QFC_MINER_RPC_URL=https://rpc.testnet.qfc.network \
   -e QFC_MINER_BACKEND=cpu \
-  ghcr.io/qfc-network/qfc-core:main
+  ghcr.io/qfc-network/qfc-core:latest
 ```
 
 > Note: Set `QFC_MINER_MODE=true` to run as inference miner instead of full node.

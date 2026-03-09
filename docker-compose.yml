@@ -13,7 +13,7 @@
 
 services:
   qfc-node:
-    image: ghcr.io/qfc-network/qfc-core:main
+    image: ghcr.io/qfc-network/qfc-core:latest
     container_name: qfc-node
     restart: unless-stopped
     ports:

@@ -22,7 +22,7 @@ Community-facing testnet onboarding repo for the QFC (Quantum-Flux Chain) blockc
 | Explorer | `https://explorer.testnet.qfc.network` |
 | Faucet | `https://faucet.testnet.qfc.network` |
 | Consensus | Proof of Contribution (PoC) — 7 scoring dimensions |
-| Docker image | `ghcr.io/qfc-network/qfc-core:main` |
+| Docker image | `ghcr.io/qfc-network/qfc-core:latest` |
 
 ## start-miner.sh Architecture
 
