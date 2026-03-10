@@ -10,6 +10,8 @@
 #   .\install.ps1 -Update      # Force update to latest version
 #
 # Supports: Windows 10/11 x86_64 (NVIDIA GPU via CUDA or CPU)
+# A dedicated CUDA build (qfc-windows-x86_64-cuda) is available for NVIDIA GPUs.
+# The script auto-detects your GPU and downloads the appropriate version.
 # No Rust toolchain required — downloads pre-built binaries.
 
 param(
