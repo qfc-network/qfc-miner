@@ -20,7 +20,7 @@ jobs:
           - name: macOS Apple Silicon
             os: macos-14
             target: aarch64-apple-darwin
-            features: metal,candle
+            features: coreml
             artifact: qfc-macos-arm64
           - name: macOS Intel
             os: macos-13
@@ -32,6 +32,11 @@ jobs:
             target: x86_64-unknown-linux-gnu
             features: candle
             artifact: qfc-linux-x86_64
+          - name: Linux ARM64 CPU
+            os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            features: candle
+            artifact: qfc-linux-arm64
           - name: Windows x86_64 CPU
             os: windows-2022
             target: x86_64-pc-windows-msvc
@@ -94,7 +99,12 @@ jobs:
           mkdir -p dist
           cp qfc-core/target/${{ matrix.target }}/release/qfc-miner dist/
           cd dist && tar czf ../${{ matrix.artifact }}.tar.gz qfc-miner
-          sha256sum ../${{ matrix.artifact }}.tar.gz > ../${{ matrix.artifact }}.tar.gz.sha256
+          cd ..
+          if command -v sha256sum &>/dev/null; then
+            sha256sum ${{ matrix.artifact }}.tar.gz > ${{ matrix.artifact }}.tar.gz.sha256
+          else
+            shasum -a 256 ${{ matrix.artifact }}.tar.gz > ${{ matrix.artifact }}.tar.gz.sha256
+          fi
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
@@ -155,5 +165,6 @@ jobs:
             | macOS Apple Silicon | `qfc-macos-arm64.tar.gz` | Metal ✅ |
             | macOS Intel | `qfc-macos-intel.tar.gz` | CPU |
             | Linux x86_64 | `qfc-linux-x86_64.tar.gz` | CUDA (if available) |
+            | Linux ARM64 | `qfc-linux-arm64.tar.gz` | CPU |
             | Windows x86_64 | `qfc-windows-x86_64.zip` | CPU |
             | Windows x86_64 CUDA | `qfc-windows-x86_64-cuda.zip` | CUDA ✅ |
