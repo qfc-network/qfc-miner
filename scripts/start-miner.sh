@@ -136,7 +136,7 @@ build_from_source() {
 
     local FEATURES="candle"
     if [[ "$BACKEND" == "metal" ]]; then
-        FEATURES="metal,candle"
+        FEATURES="coreml"
     elif [[ "$BACKEND" == "cuda" ]]; then
         FEATURES="cuda,candle"
     elif [[ "$BACKEND" == "rocm" ]]; then
