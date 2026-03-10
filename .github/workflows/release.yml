@@ -37,6 +37,13 @@ jobs:
             target: x86_64-pc-windows-msvc
             features: candle
             artifact: qfc-windows-x86_64
+          - name: Windows x86_64 CUDA
+            os: windows-2022
+            target: x86_64-pc-windows-msvc
+            features: cuda,candle
+            artifact: qfc-windows-x86_64-cuda
+
+    continue-on-error: ${{ contains(matrix.features, 'cuda') }}
 
     steps:
       - name: Checkout qfc-miner repo
@@ -58,6 +65,14 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: qfc-core
+
+      - name: Install CUDA Toolkit
+        if: contains(matrix.features, 'cuda')
+        uses: Jimver/cuda-toolkit@v0.2.19
+        with:
+          cuda: '12.6.3'
+          method: network
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "cusolver", "cusolver_dev", "curand", "curand_dev"]'
 
       - name: Install Linux deps
         if: runner.os == 'Linux'
@@ -140,4 +155,5 @@ jobs:
             | macOS Apple Silicon | `qfc-macos-arm64.tar.gz` | Metal ✅ |
             | macOS Intel | `qfc-macos-intel.tar.gz` | CPU |
             | Linux x86_64 | `qfc-linux-x86_64.tar.gz` | CUDA (if available) |
-            | Windows x86_64 | `qfc-windows-x86_64.zip` | CUDA (if available) |
+            | Windows x86_64 | `qfc-windows-x86_64.zip` | CPU |
+            | Windows x86_64 CUDA | `qfc-windows-x86_64-cuda.zip` | CUDA ✅ |
