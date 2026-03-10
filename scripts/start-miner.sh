@@ -228,11 +228,14 @@ check_for_update() {
         info "Latest release: $LATEST_VER (local version unknown)"
     fi
 
-    echo -e "${YELLOW}  ┌──────────────────────────────────────────────┐${NC}"
-    echo -e "${YELLOW}  │  A new version of qfc-miner is available!   │${NC}"
     local DISPLAY_VER="${LOCAL_VER:-unknown}"
-    echo -e "${YELLOW}  │  ${DISPLAY_VER} → ${LATEST_VER}$(printf '%*s' $((34 - ${#LATEST_VER} - ${#DISPLAY_VER})) '')│${NC}"
-    echo -e "${YELLOW}  └──────────────────────────────────────────────┘${NC}"
+    local VER_LINE="${DISPLAY_VER} → ${LATEST_VER}"
+    echo -e "${YELLOW}  ┌───────────────────────────────────────────────┐${NC}"
+    echo -e "${YELLOW}  │                                               │${NC}"
+    printf "${YELLOW}  │   %-44s│${NC}\n" "A new version of qfc-miner is available!"
+    printf "${YELLOW}  │   %-44s│${NC}\n" "$VER_LINE"
+    echo -e "${YELLOW}  │                                               │${NC}"
+    echo -e "${YELLOW}  └───────────────────────────────────────────────┘${NC}"
 
     # Auto-update unless QFC_NO_UPDATE=1
     if [[ "${QFC_NO_UPDATE:-0}" == "1" ]]; then
@@ -256,10 +259,12 @@ check_for_update() {
 # === Main flow ===
 
 echo ""
-echo "  ╔═════════════════════════════════════════╗"
-echo "  ║  QFC Inference Miner Setup              ║"
-echo "  ║  Earn rewards by providing AI compute   ║"
-echo "  ╚═════════════════════════════════════════╝"
+echo "  ╔═══════════════════════════════════════════════╗"
+echo "  ║                                               ║"
+echo "  ║   QFC Inference Miner Setup                   ║"
+echo "  ║   Earn rewards by providing AI compute        ║"
+echo "  ║                                               ║"
+echo "  ╚═══════════════════════════════════════════════╝"
 echo ""
 
 # --- Step 1: Detect platform ---
@@ -333,12 +338,14 @@ fi
 # --- Step 5: Start miner ---
 echo ""
 echo "  ┌───────────────────────────────────────────────┐"
-printf "  │  %-43s │\n" "Starting QFC Inference Miner"
-printf "  │  %-43s │\n" "Wallet:  ${ADDR:0:20}..."
-printf "  │  %-43s │\n" "Backend: $BACKEND"
-printf "  │  %-43s │\n" "RPC:     $RPC_URL"
-printf "  │  %-43s │\n" ""
-printf "  │  %-43s │\n" "Press Ctrl+C to stop"
+echo "  │                                               │"
+printf "  │   %-44s│\n" "Starting QFC Inference Miner"
+printf "  │   %-44s│\n" "Wallet:  ${ADDR:0:20}..."
+printf "  │   %-44s│\n" "Backend: $BACKEND"
+printf "  │   %-44s│\n" "RPC:     $RPC_URL"
+echo "  │                                               │"
+printf "  │   %-44s│\n" "Press Ctrl+C to stop"
+echo "  │                                               │"
 echo "  └───────────────────────────────────────────────┘"
 echo ""
 
