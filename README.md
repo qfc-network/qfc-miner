@@ -14,126 +14,7 @@ Join the QFC (Quantum-Flux Chain) public testnet.
 | Block Time | ~3 seconds |
 | Consensus | Proof of Contribution (PoC) |
 
----
-
-## Inference Miner (Earn QFC with AI Compute)
-
-QFC v2.0 supports **AI inference mining** — provide compute power to run AI models and earn QFC rewards.
-
-### Option 1: One-Click Script (Recommended)
-
-```bash
-curl -sLO https://raw.githubusercontent.com/qfc-network/testnet/main/scripts/start-miner.sh
-chmod +x start-miner.sh
-./start-miner.sh
-```
-
-The script automatically detects your hardware, downloads the binary, generates a wallet, requests faucet tokens, and starts mining.
-
-```bash
-./start-miner.sh --status    # Check miner status
-./start-miner.sh --update    # Update to latest version
-BUILD=1 ./start-miner.sh     # Build from source instead of downloading
-```
-
-### Option 2: Build from Source
-
-```bash
-# Clone and build
-git clone https://github.com/qfc-network/qfc-core.git
-cd qfc-core
-cargo build --release --bin qfc-miner
-
-# Apple Silicon (Metal GPU acceleration):
-# cargo build --release --features metal --bin qfc-miner
-
-# With TUI dashboard:
-# cargo build --release --features tui --bin qfc-miner
-
-# Generate wallet
-./target/release/qfc-miner --generate-wallet
-# Save the Address and Private Key!
-
-# Start mining
-export QFC_MINER_WALLET=0x<YOUR_ADDRESS>
-export QFC_MINER_PRIVATE_KEY=0x<YOUR_PRIVATE_KEY>
-./target/release/qfc-miner \
-  --validator-rpc https://rpc.testnet.qfc.network \
-  --backend cpu
-```
-
-### Option 3: Docker
-
-```bash
-docker run --rm \
-  -e QFC_MINER_MODE=true \
-  -e QFC_MINER_WALLET=0x<YOUR_ADDRESS> \
-  -e QFC_MINER_PRIVATE_KEY=0x<YOUR_PRIVATE_KEY> \
-  -e QFC_MINER_RPC_URL=https://rpc.testnet.qfc.network \
-  -e QFC_MINER_BACKEND=cpu \
-  ghcr.io/qfc-network/qfc-core:latest
-```
-
-> Note: Set `QFC_MINER_MODE=true` to run as inference miner instead of full node.
-
-### TUI Dashboard
-
-Build with the `tui` feature to get a real-time terminal dashboard:
-
-```bash
-cargo build --release --features tui --bin qfc-miner
-
-./target/release/qfc-miner \
-  --wallet $QFC_MINER_WALLET \
-  --private-key $QFC_MINER_PRIVATE_KEY \
-  --validator-rpc https://rpc.testnet.qfc.network \
-  --backend cpu \
-  --dashboard
-```
-
-The dashboard shows earnings, task history, performance stats, and a scrollable log panel.
-
-| Key | Action |
-|-----|--------|
-| `↑` / `k` | Scroll logs up |
-| `↓` / `j` | Scroll logs down |
-| `PgUp` / `PgDn` | Scroll 5 lines |
-| `Home` / `End` | Jump to oldest / latest |
-| `q` / `Esc` | Quit |
-
-Logs are also saved to `qfc-miner.log` in the working directory.
-
-### GPU Tiers & Supported Tasks
-
-| Tier | Memory | Hardware Examples | Tasks |
-|------|--------|-------------------|-------|
-| Hot | 32 GB+ | M2 Ultra, M3 Max, A100 | All models, large LLMs |
-| Warm | 16–31 GB | M1/M2/M3 Pro | Medium models, embeddings |
-| Cold | < 16 GB | Intel Mac, M1/M2 base | Small models, embeddings |
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `QFC_MINER_RPC_URL` | `https://rpc.testnet.qfc.network` | Validator RPC endpoint |
-| `QFC_MINER_WALLET` | — | Wallet address (hex, with 0x prefix) |
-| `QFC_MINER_PRIVATE_KEY` | — | Private key (hex, with 0x prefix) |
-| `QFC_MINER_BACKEND` | `auto` | `cpu`, `metal`, `cuda`, or `auto` |
-| `QFC_MINER_MODEL_DIR` | `./models` | Model cache directory |
-| `QFC_MINER_MAX_MEMORY` | `0` (auto) | Max memory in MB |
-
-### How It Works
-
-1. Miner registers with the validator and reports hardware capabilities
-2. Validator assigns inference tasks every ~10 seconds (embedding, text generation, etc.)
-3. Miner runs inference and submits a cryptographic proof
-4. Validators verify proofs (5% random spot-check re-execution)
-5. Honest miners earn QFC rewards proportional to compute contribution
-6. Dishonest proofs → 5% stake slash + 6h ban
-
----
-
-## Full Node (Docker)
+## Quick Start (Docker)
 
 ```bash
 # Download config files
@@ -147,7 +28,7 @@ docker compose up -d
 docker logs -f qfc-node
 ```
 
-Your node will connect to the bootnode and start syncing.
+That's it. Your node will connect to the bootnode and start syncing.
 
 ### Mining (optional)
 
@@ -165,7 +46,7 @@ Run a validator node (requires 10,000+ QFC staked):
 QFC_VALIDATOR_KEY=<your-secret-key-hex> QFC_MINING_ENABLED=true docker compose up -d
 ```
 
-## Build from Source (Full Node)
+## Build from Source
 
 ```bash
 git clone https://github.com/qfc-network/qfc-core.git
@@ -232,6 +113,103 @@ Your validator priority is determined by 7 dimensions:
 | Network | 10% | Good P2P connectivity |
 | Storage | 5% | Serve state snapshots |
 | Reputation | 5% | Long-term honest behavior |
+
+## Inference Miner (Earn Rewards with AI Compute)
+
+QFC v2.0 supports **AI inference mining** — provide compute power to run AI models and earn QFC rewards.
+
+### One-Click Start (macOS / Linux)
+
+```bash
+curl -sLO https://raw.githubusercontent.com/qfc-network/testnet/main/scripts/start-miner.sh
+chmod +x start-miner.sh
+./start-miner.sh
+```
+
+The script automatically:
+1. Installs Rust (if needed)
+2. Detects your hardware (CPU/Metal/CUDA)
+3. Builds the miner binary
+4. Generates a wallet
+5. Requests faucet tokens
+6. Starts mining
+
+
+### Windows (PowerShell)
+
+```powershell
+iwr https://raw.githubusercontent.com/qfc-network/qfc-miner/main/scripts/install.ps1 | iex
+```
+
+The script automatically:
+1. Detects your GPU (NVIDIA CUDA or CPU fallback)
+2. Downloads the pre-built `qfc-miner.exe`
+3. Generates a wallet
+4. Requests faucet tokens
+5. Starts mining
+
+> **Requires:** Windows 10/11 x86_64, PowerShell 5.1+
+> **NVIDIA GPU:** Automatically used if `nvidia-smi` is found
+
+### Manual Setup
+
+```bash
+# 1. Build (Intel Mac or Linux CPU-only)
+git clone https://github.com/qfc-network/qfc-core.git
+cd qfc-core
+cargo build --release --features candle --bin qfc-miner
+
+# Apple Silicon (Metal GPU):
+# cargo build --release --features metal,candle --bin qfc-miner
+
+# 2. Generate wallet
+./target/release/qfc-miner --generate-wallet
+
+# 3. Start mining
+./target/release/qfc-miner \
+  --wallet <YOUR_WALLET_ADDRESS> \
+  --private-key <YOUR_PRIVATE_KEY> \
+  --validator-rpc https://rpc.testnet.qfc.network \
+  --backend cpu
+```
+
+### GPU Tiers & Supported Tasks
+
+| Tier | Memory | Hardware Examples | Tasks |
+|------|--------|-------------------|-------|
+| Hot | 32 GB+ | M2 Ultra, M3 Max, A100 | All models, large LLMs |
+| Warm | 16–31 GB | M1/M2/M3 Pro | Medium models, embeddings |
+| Cold | < 16 GB | Intel Mac, M1/M2 base | Small models, embeddings |
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `QFC_MINER_RPC_URL` | `https://rpc.testnet.qfc.network` | Validator RPC endpoint |
+| `QFC_MINER_WALLET` | — | Wallet address (hex) |
+| `QFC_MINER_PRIVATE_KEY` | — | Private key (hex) |
+| `QFC_MINER_BACKEND` | `auto` | `cpu`, `metal`, `cuda`, or `auto` |
+| `QFC_MINER_MODEL_DIR` | `./models` | Model cache directory |
+| `QFC_MINER_MAX_MEMORY` | `0` (auto) | Max memory in MB |
+
+### Docker
+
+```bash
+docker run -e QFC_MINER_WALLET=<ADDR> \
+           -e QFC_MINER_PRIVATE_KEY=<KEY> \
+           -e QFC_MINER_RPC_URL=https://rpc.testnet.qfc.network \
+           -e QFC_MINER_BACKEND=cpu \
+           ghcr.io/qfc-network/qfc-miner:main
+```
+
+### How It Works
+
+1. Miner fetches inference tasks from the network (every ~10s)
+2. Loads the required AI model (cached after first download)
+3. Runs inference and submits a cryptographic proof
+4. Validators verify proofs (5% random spot-check)
+5. Honest miners earn block rewards proportional to compute contribution
+6. Dishonest proofs → 5% stake slash + 6h ban
 
 ## Hardware Requirements
 
