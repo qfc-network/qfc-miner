@@ -87,12 +87,20 @@ jobs:
           workspaces: qfc-core
 
       - name: Install CUDA Toolkit
-        if: contains(matrix.features, 'cuda')
+        if: contains(matrix.features, 'cuda') && !contains(matrix.target, 'aarch64')
         uses: Jimver/cuda-toolkit@v0.2.21
         with:
           cuda: '12.6.0'
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "cusolver", "cusolver_dev", "curand", "curand_dev"]'
+
+      - name: Install CUDA Toolkit (ARM64)
+        if: contains(matrix.features, 'cuda') && contains(matrix.target, 'aarch64')
+        run: |
+          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/sbsa/cuda-keyring_1.1-1_all.deb
+          sudo dpkg -i cuda-keyring_1.1-1_all.deb
+          sudo apt-get update
+          sudo apt-get install -y cuda-toolkit-12-6
 
       - name: Install Linux deps
         if: runner.os == 'Linux'
