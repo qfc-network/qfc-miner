@@ -188,6 +188,31 @@ cargo build --release --features candle --bin qfc-miner
   --backend auto
 ```
 
+#### Windows CUDA Build (from source)
+
+Building with CUDA on Windows requires the CUDA Toolkit and MSVC (Visual Studio Build Tools):
+
+```powershell
+# Prerequisites:
+#   1. Install Visual Studio 2022 Build Tools (with "Desktop development with C++")
+#   2. Install CUDA Toolkit 12.x from https://developer.nvidia.com/cuda-downloads
+#   3. Install Rust from https://rustup.rs
+
+# Open "x64 Native Tools Command Prompt" or run from PowerShell:
+git clone https://github.com/qfc-network/qfc-core.git
+cd qfc-core
+
+# Set CUDA_PATH if not already set by the installer
+$env:CUDA_PATH = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6"
+
+# Set the compute capability for your GPU (89 = RTX 40xx, 86 = RTX 30xx)
+$env:CUDA_COMPUTE_CAP = "89"
+
+cargo build --release --features cuda,candle --bin qfc-miner
+```
+
+If `link.exe` reports missing CUDA libraries, verify that `%CUDA_PATH%\lib\x64` contains `cudart.lib`, `cublas.lib`, etc. The build script auto-detects `CUDA_PATH` and adds the library directories.
+
 ### GPU Tiers & Supported Tasks
 
 | Tier | Memory | Hardware Examples | Tasks |

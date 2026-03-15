@@ -104,11 +104,36 @@ jobs:
 
       - name: Install CUDA Toolkit (Windows)
         if: runner.os == 'Windows' && contains(matrix.features, 'cuda')
+        id: cuda-toolkit-windows
         uses: Jimver/cuda-toolkit@v0.2.21
         with:
           cuda: '12.6.0'
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "cusolver", "cusolver_dev", "curand", "curand_dev"]'
+
+      - name: Set Windows CUDA env vars
+        if: runner.os == 'Windows' && contains(matrix.features, 'cuda')
+        shell: pwsh
+        run: |
+          $cudaPath = "${{ steps.cuda-toolkit-windows.outputs.CUDA_PATH }}"
+          if (-not $cudaPath) { $cudaPath = $env:CUDA_PATH }
+          if (-not $cudaPath) { $cudaPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6" }
+
+          Write-Host "CUDA_PATH = $cudaPath"
+
+          # Emit for subsequent steps
+          echo "CUDA_PATH=$cudaPath" >> $env:GITHUB_ENV
+          echo "CUDA_HOME=$cudaPath" >> $env:GITHUB_ENV
+          echo "$cudaPath\bin" >> $env:GITHUB_PATH
+
+          # Verify critical libs exist
+          $libDir = "$cudaPath\lib\x64"
+          if (Test-Path "$libDir\cudart.lib") {
+            Write-Host "Found cudart.lib in $libDir"
+          } else {
+            Write-Host "WARNING: cudart.lib not found in $libDir"
+            Get-ChildItem "$cudaPath\lib" -Recurse -Filter "*.lib" | Select-Object -First 20
+          }
 
       - name: Install Linux deps
         if: runner.os == 'Linux'

@@ -36,16 +36,21 @@ function Err   ($msg) { Write-Host "[ERROR] $msg" -ForegroundColor Red; exit 1 }
 
 # --- Detect GPU ---
 function Detect-Backend {
-    try {
-        $nvidiaSmi = Get-Command "nvidia-smi.exe" -ErrorAction SilentlyContinue
-        if ($nvidiaSmi) {
-            $gpuInfo = & nvidia-smi --query-gpu=name --format=csv,noheader 2>$null | Select-Object -First 1
-            if ($gpuInfo) {
+    # nvidia-smi is installed by the NVIDIA driver into System32
+    $nvidiaSmiPaths = @(
+        "nvidia-smi.exe",
+        "$env:SystemRoot\System32\nvidia-smi.exe",
+        "$env:ProgramFiles\NVIDIA Corporation\NVSMI\nvidia-smi.exe"
+    )
+    foreach ($smiPath in $nvidiaSmiPaths) {
+        try {
+            $gpuInfo = & $smiPath --query-gpu=name --format=csv,noheader 2>$null | Select-Object -First 1
+            if ($LASTEXITCODE -eq 0 -and $gpuInfo) {
                 Ok "NVIDIA GPU detected: $gpuInfo"
                 return "cuda"
             }
-        }
-    } catch {}
+        } catch {}
+    }
     Ok "No NVIDIA GPU detected — using CPU backend"
     return "cpu"
 }
