@@ -37,6 +37,11 @@ jobs:
             target: aarch64-unknown-linux-gnu
             features: candle
             artifact: qfc-linux-arm64
+          - name: Linux ARM64 CUDA
+            os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            features: cuda,candle
+            artifact: qfc-linux-arm64-cuda
           - name: Linux x86_64 OpenCL
             os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
@@ -96,7 +101,7 @@ jobs:
         working-directory: qfc-core
         shell: bash
         env:
-          CUDA_COMPUTE_CAP: ${{ contains(matrix.features, 'cuda') && '89' || '' }}
+          CUDA_COMPUTE_CAP: ${{ contains(matrix.features, 'cuda') && (contains(matrix.target, 'aarch64') && '90' || '89') || '' }}
         run: |
           cargo build --release \
             --features "${{ matrix.features }}" \
@@ -178,5 +183,6 @@ jobs:
             | Linux x86_64 | `qfc-linux-x86_64.tar.gz` | CPU |
             | Linux x86_64 OpenCL | `qfc-linux-x86_64-opencl.tar.gz` | AMD/Intel GPU (OpenCL) |
             | Linux ARM64 | `qfc-linux-arm64.tar.gz` | CPU |
+            | Linux ARM64 CUDA | `qfc-linux-arm64-cuda.tar.gz` | NVIDIA GPU (DGX Spark/Grace Blackwell) |
             | Windows x86_64 | `qfc-windows-x86_64.zip` | CPU |
             | Windows x86_64 CUDA | `qfc-windows-x86_64-cuda.zip` | CUDA ✅ |

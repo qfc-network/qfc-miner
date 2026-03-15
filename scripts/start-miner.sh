@@ -51,9 +51,15 @@ detect_platform() {
         fi
     elif [[ "$OS" == "Linux" ]]; then
         if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-            PLATFORM="linux-arm64"
-            BACKEND="cpu"
-            PLATFORM_DESC="Linux ARM64 (CPU)"
+            if command -v nvidia-smi &>/dev/null; then
+                PLATFORM="linux-arm64-cuda"
+                BACKEND="cuda"
+                PLATFORM_DESC="Linux ARM64 (NVIDIA GPU)"
+            else
+                PLATFORM="linux-arm64"
+                BACKEND="cpu"
+                PLATFORM_DESC="Linux ARM64 (CPU)"
+            fi
         else
             PLATFORM="linux-x86_64"
             if command -v nvidia-smi &>/dev/null; then
