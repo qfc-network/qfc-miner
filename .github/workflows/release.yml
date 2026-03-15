@@ -57,10 +57,10 @@ jobs:
 
     steps:
       - name: Checkout qfc-miner repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout qfc-core (source)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: qfc-network/qfc-core
           ref: main
@@ -78,7 +78,7 @@ jobs:
 
       - name: Install CUDA Toolkit
         if: contains(matrix.features, 'cuda')
-        uses: Jimver/cuda-toolkit@v0.2.19
+        uses: Jimver/cuda-toolkit@v0.2.21
         with:
           cuda: '12.6.0'
           method: network
@@ -124,7 +124,7 @@ jobs:
           "$hash  ${{ matrix.artifact }}.zip" | Set-Content "${{ matrix.artifact }}.zip.sha256"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.artifact }}
           path: |
@@ -137,7 +137,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           merge-multiple: true
 
