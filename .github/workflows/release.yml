@@ -42,6 +42,11 @@ jobs:
             target: aarch64-unknown-linux-gnu
             features: cuda,candle
             artifact: qfc-linux-arm64-cuda
+          - name: Linux x86_64 CUDA
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            features: cuda,candle
+            artifact: qfc-linux-x86_64-cuda
           - name: Linux x86_64 OpenCL
             os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
@@ -181,6 +186,7 @@ jobs:
             | macOS Apple Silicon | `qfc-macos-arm64.tar.gz` | Metal ✅ |
             | macOS Intel | `qfc-macos-intel.tar.gz` | CPU |
             | Linux x86_64 | `qfc-linux-x86_64.tar.gz` | CPU |
+            | Linux x86_64 CUDA | `qfc-linux-x86_64-cuda.tar.gz` | NVIDIA GPU (H100/H200/A100/RTX) ✅ |
             | Linux x86_64 OpenCL | `qfc-linux-x86_64-opencl.tar.gz` | AMD/Intel GPU (OpenCL) |
             | Linux ARM64 | `qfc-linux-arm64.tar.gz` | CPU |
             | Linux ARM64 CUDA | `qfc-linux-arm64-cuda.tar.gz` | NVIDIA GPU (DGX Spark/Grace Blackwell) |
