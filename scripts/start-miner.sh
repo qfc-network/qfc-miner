@@ -16,7 +16,10 @@
 set -euo pipefail
 
 VERSION="${QFC_VERSION:-latest}"
-GITHUB_REPO="qfc-network/qfc-core"
+# Pre-built binaries (CUDA/OpenCL/Windows/ARM64-CUDA) live in the miner repo.
+# Source clones fall back to qfc-core since that's where the Rust code lives.
+BINARIES_REPO="${QFC_BINARIES_REPO:-qfc-network/qfc-miner}"
+SOURCE_REPO="${QFC_SOURCE_REPO:-qfc-network/qfc-core}"
 INSTALL_DIR="${QFC_MINER_DIR:-$HOME/.qfc-miner}"
 WALLET_FILE="$INSTALL_DIR/wallet.json"
 RPC_URL="${QFC_MINER_RPC_URL:-https://rpc.testnet.qfc.network}"
@@ -96,11 +99,11 @@ download_binary() {
 
     if [[ "$VERSION" == "latest" ]]; then
         info "Fetching latest release..."
-        DOWNLOAD_URL=$(curl -sfL "https://api.github.com/repos/$GITHUB_REPO/releases/latest" \
+        DOWNLOAD_URL=$(curl -sfL "https://api.github.com/repos/$BINARIES_REPO/releases/latest" \
             | grep "browser_download_url.*qfc-${PLATFORM}.tar.gz\"" \
             | cut -d'"' -f4)
     else
-        DOWNLOAD_URL="https://github.com/$GITHUB_REPO/releases/download/$VERSION/qfc-${PLATFORM}.tar.gz"
+        DOWNLOAD_URL="https://github.com/$BINARIES_REPO/releases/download/$VERSION/qfc-${PLATFORM}.tar.gz"
     fi
 
     if [[ -z "${DOWNLOAD_URL:-}" ]]; then
@@ -161,7 +164,7 @@ build_from_source() {
     if [[ -d "$SRC_DIR" ]]; then
         cd "$SRC_DIR" && git pull --ff-only origin main 2>/dev/null || true
     else
-        git clone --depth 1 "https://github.com/$GITHUB_REPO.git" "$SRC_DIR"
+        git clone --depth 1 "https://github.com/$SOURCE_REPO.git" "$SRC_DIR"
         cd "$SRC_DIR"
     fi
 
@@ -204,7 +207,7 @@ if [[ "${1:-}" == "--update" ]]; then
         download_binary || build_from_source
     fi
     # Save version tag
-    LATEST_VER=$(curl -sfL "https://api.github.com/repos/$GITHUB_REPO/releases/latest" \
+    LATEST_VER=$(curl -sfL "https://api.github.com/repos/$BINARIES_REPO/releases/latest" \
         | grep '"tag_name"' | head -1 | cut -d'"' -f4) || true
     [[ -n "${LATEST_VER:-}" ]] && echo "$LATEST_VER" > "$INSTALL_DIR/.version"
     ok "Update complete. Restart the miner to use the new version."
@@ -223,7 +226,7 @@ check_for_update() {
 
     info "Checking for updates..."
     local LATEST_VER
-    LATEST_VER=$(curl -sfL "https://api.github.com/repos/$GITHUB_REPO/releases/latest" \
+    LATEST_VER=$(curl -sfL "https://api.github.com/repos/$BINARIES_REPO/releases/latest" \
         | grep '"tag_name"' | head -1 | cut -d'"' -f4) || true
 
     if [[ -z "${LATEST_VER:-}" ]]; then
@@ -295,13 +298,13 @@ if [[ -x "$BINARY" && "${1:-}" != "--force" ]]; then
 elif [[ "$BUILD" == "1" ]]; then
     build_from_source
     # Save initial version tag
-    INIT_VER=$(curl -sfL "https://api.github.com/repos/$GITHUB_REPO/releases/latest" \
+    INIT_VER=$(curl -sfL "https://api.github.com/repos/$BINARIES_REPO/releases/latest" \
         | grep '"tag_name"' | head -1 | cut -d'"' -f4) || true
     [[ -n "${INIT_VER:-}" ]] && echo "$INIT_VER" > "$INSTALL_DIR/.version"
 else
     download_binary || build_from_source
     # Save initial version tag
-    INIT_VER=$(curl -sfL "https://api.github.com/repos/$GITHUB_REPO/releases/latest" \
+    INIT_VER=$(curl -sfL "https://api.github.com/repos/$BINARIES_REPO/releases/latest" \
         | grep '"tag_name"' | head -1 | cut -d'"' -f4) || true
     [[ -n "${INIT_VER:-}" ]] && echo "$INIT_VER" > "$INSTALL_DIR/.version"
 fi
