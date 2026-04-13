@@ -146,19 +146,23 @@ iwr https://raw.githubusercontent.com/qfc-network/qfc-miner/main/scripts/install
 
 ### Supported Platforms
 
-| Platform | File | GPU Support |
-|----------|------|-------------|
-| macOS Apple Silicon | `qfc-macos-arm64.tar.gz` | Metal |
-| macOS Intel | `qfc-macos-intel.tar.gz` | CPU |
-| Linux x86_64 | `qfc-linux-x86_64.tar.gz` | CPU |
-| Linux x86_64 CUDA | `qfc-linux-x86_64-cuda.tar.gz` | NVIDIA GPU (H100/H200/A100/RTX) |
-| Linux x86_64 OpenCL | `qfc-linux-x86_64-opencl.tar.gz` | AMD/Intel GPU |
-| Linux ARM64 | `qfc-linux-arm64.tar.gz` | CPU |
-| Linux ARM64 CUDA | `qfc-linux-arm64-cuda.tar.gz` | NVIDIA GPU (DGX Spark / Grace Blackwell) |
-| Windows x86_64 | `qfc-windows-x86_64.zip` | CPU |
-| Windows x86_64 CUDA | `qfc-windows-x86_64-cuda.zip` | NVIDIA GPU |
+Pre-built binaries live in two repos. `start-miner.sh` pulls from both automatically; if you download manually, use the repo marked below.
 
-GPU auto-detection priority: **CUDA > Metal > ROCm > OpenCL > CPU**
+| Platform | File | GPU Support | Release repo |
+|----------|------|-------------|-----|
+| macOS Apple Silicon | `qfc-macos-arm64.tar.gz` | Metal | qfc-miner + qfc-core |
+| macOS Intel | `qfc-macos-intel.tar.gz` | CPU | qfc-miner + qfc-core |
+| Linux x86_64 | `qfc-linux-x86_64.tar.gz` | CPU | qfc-miner + qfc-core |
+| Linux x86_64 CUDA | `qfc-linux-x86_64-cuda.tar.gz` | NVIDIA GPU (H100/H200/A100/RTX) | **qfc-miner only** |
+| Linux x86_64 OpenCL | `qfc-linux-x86_64-opencl.tar.gz` | AMD/Intel GPU via OpenCL | **qfc-miner only** |
+| Linux x86_64 ROCm | `qfc-linux-x86_64-rocm.tar.gz` | AMD GPU via ROCm | **qfc-core only** |
+| Linux ARM64 | `qfc-linux-arm64.tar.gz` | CPU | qfc-miner + qfc-core |
+| Linux ARM64 CUDA | `qfc-linux-arm64-cuda.tar.gz` | NVIDIA GPU (DGX Spark / Grace Blackwell) | **qfc-miner only** |
+| Windows x86_64 | `qfc-windows-x86_64.zip` | CPU | **qfc-miner only** |
+
+GPU auto-detection priority: **CUDA > Metal > ROCm > OpenCL > CPU**.
+
+> If `start-miner.sh` reports "No pre-built binary found for &lt;platform&gt;", fall back is a build from source (requires Rust toolchain + any platform-specific SDK like CUDA). To override the download repos: `QFC_BINARIES_REPO=qfc-network/qfc-miner QFC_SOURCE_REPO=qfc-network/qfc-core`.
 
 ### Manual Setup
 
