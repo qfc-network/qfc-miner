@@ -22,7 +22,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$GITHUB_REPO = "qfc-network/qfc-core"
+# Pre-built Windows binaries are published on qfc-miner releases (9 platforms),
+# not qfc-core (fewer, older). Override with $env:QFC_BINARIES_REPO if needed.
+$GITHUB_REPO = if ($env:QFC_BINARIES_REPO) { $env:QFC_BINARIES_REPO } else { "qfc-network/qfc-miner" }
 $INSTALL_DIR = "$env:USERPROFILE\.qfc-miner"
 $WALLET_FILE = "$INSTALL_DIR\wallet.json"
 $RPC_URL     = if ($env:QFC_MINER_RPC_URL) { $env:QFC_MINER_RPC_URL } else { "https://rpc.testnet.qfc.network" }
@@ -155,6 +157,28 @@ if ($needInstall) {
         }
     }
 }
+
+# --- Step 2b: Warn if binary and chain versions have drifted apart ---
+function Check-ChainCompat {
+    $binTag = if (Test-Path $VERSION_FILE) { (Get-Content $VERSION_FILE | Select-Object -First 1).Trim() } else { "" }
+    if (-not $binTag) { return }
+    try {
+        $body = '{"jsonrpc":"2.0","method":"qfc_nodeInfo","params":[],"id":1}'
+        $resp = Invoke-RestMethod $RPC_URL -Method Post -Body $body -ContentType "application/json" -TimeoutSec 10
+        $chainVer = $resp.result.version
+    } catch { return }  # RPC unreachable — not fatal for install
+    if (-not $chainVer) { return }
+    $binMM   = ($binTag.TrimStart("v").Split(".") | Select-Object -First 2) -join "."
+    $chainMM = ($chainVer.Split(".") | Select-Object -First 2) -join "."
+    if ($binMM -ne $chainMM) {
+        Warn "Version drift: miner binary $binTag vs chain node v$chainVer."
+        Warn "Proofs may be rejected if the protocol changed between these versions."
+        Warn "Check https://github.com/$GITHUB_REPO/releases for a release matching the chain."
+    } else {
+        Ok "Binary $binTag matches chain v$chainVer (major.minor)"
+    }
+}
+Check-ChainCompat
 
 # --- Step 3: Generate wallet ---
 if (Test-Path $WALLET_FILE) {

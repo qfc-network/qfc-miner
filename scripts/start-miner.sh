@@ -309,6 +309,32 @@ else
     [[ -n "${INIT_VER:-}" ]] && echo "$INIT_VER" > "$INSTALL_DIR/.version"
 fi
 
+# --- Step 2b: Warn if binary and chain versions have drifted apart ---
+check_chain_compat() {
+    local BIN_TAG=""
+    [[ -f "$INSTALL_DIR/.version" ]] && BIN_TAG=$(head -1 "$INSTALL_DIR/.version" 2>/dev/null)
+    [[ -n "$BIN_TAG" ]] || return 0
+
+    local CHAIN_VER
+    CHAIN_VER=$(curl -sf -m 10 "$RPC_URL" -X POST -H "Content-Type: application/json" \
+        -d '{"jsonrpc":"2.0","method":"qfc_nodeInfo","params":[],"id":1}' 2>/dev/null \
+        | grep -o '"version":"[^"]*"' | head -1 | cut -d'"' -f4) || true
+    [[ -n "${CHAIN_VER:-}" ]] || return 0   # RPC unreachable — not fatal for install
+
+    local BIN_MM CHAIN_MM
+    BIN_MM=$(echo "${BIN_TAG#v}" | cut -d. -f1-2)
+    CHAIN_MM=$(echo "$CHAIN_VER" | cut -d. -f1-2)
+
+    if [[ "$BIN_MM" != "$CHAIN_MM" ]]; then
+        warn "Version drift: miner binary $BIN_TAG vs chain node v$CHAIN_VER."
+        warn "Proofs may be rejected if the protocol changed between these versions."
+        warn "Check https://github.com/$BINARIES_REPO/releases for a release matching the chain."
+    else
+        ok "Binary $BIN_TAG matches chain v$CHAIN_VER (major.minor)"
+    fi
+}
+check_chain_compat
+
 # --- Step 3: Generate wallet (if needed) ---
 if [[ -f "$WALLET_FILE" ]]; then
     ADDR=$(grep '"address"' "$WALLET_FILE" | cut -d'"' -f4)
